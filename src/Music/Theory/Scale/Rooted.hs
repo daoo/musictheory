@@ -1,4 +1,4 @@
-module Music.Theory.Rooted
+module Music.Theory.Scale.Rooted
   ( Rooted(..)
   , hasNote
   ) where
