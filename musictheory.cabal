@@ -16,9 +16,9 @@ library
   exposed-modules:
     Music.Theory.Diatonic
     Music.Theory.Note
-    Music.Theory.Rooted
     Music.Theory.SPN
     Music.Theory.Scale
+    Music.Theory.Scale.Rooted
     Music.Theory.Scale.Western
   build-depends:       base, QuickCheck
   hs-source-dirs:      src
