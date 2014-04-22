@@ -20,30 +20,25 @@ module Music.Theory.Scale.Western
   , triadAugmented
   ) where
 
-import Music.Theory.Note
 import Music.Theory.Scale
 
-{-# INLINE fromOffsets' #-}
-fromOffsets' :: [Int] -> Scale
-fromOffsets' = fromOffsets . map unsafeScaleOffset
-
 chromatic :: Scale
-chromatic = fromOffsets' [0,1,2,3,4,5,6,7,8,9,10,11]
+chromatic = emptyScale #+ 0 #+ 1 #+ 2 #+ 3 #+ 4 #+ 5 #+ 6 #+ 7 #+ 8 #+ 9 #+ 10 #+ 11
 
 major, minor :: Scale
-major = fromOffsets' [0,2,4,5,7,9,11]
-minor = fromOffsets' [0,2,3,5,7,8,10]
+major = emptyScale #+ 0 #+ 2 #+ 4 #+ 5 #+ 7 #+ 9 #+ 11
+minor = emptyScale #+ 0 #+ 2 #+ 3 #+ 5 #+ 7 #+ 8 #+ 10
 
 harmonicMinor, melodicMinor :: Scale
 harmonicMinor = raise 7 minor
 melodicMinor  = lower 3 major
 
 pentatonicMinor, pentatonicMajor :: Scale
-pentatonicMinor = fromOffsets' [0,3,5,7,10]
-pentatonicMajor = fromOffsets' [0,2,4,7,9]
+pentatonicMinor = emptyScale #+ 0 #+ 3 #+ 5 #+ 7 #+ 10
+pentatonicMajor = emptyScale #+ 0 #+ 2 #+ 4 #+ 7 #+ 9
 
 blues :: Scale
-blues = fromOffsets' [0,6]
+blues = emptyScale #+ 0 #+ 6
 
 ionian, dorian, phrygian, lydian, mixolydian, aeolian, locrian :: Scale
 ionian     = major
@@ -55,7 +50,7 @@ aeolian    = minor
 locrian    = lower 2 $ lower 5 minor
 
 triadMinor, triadMajor, triadDimnished, triadAugmented :: Scale
-triadMinor = fromOffsets' [0,3,7]
-triadMajor = fromOffsets' [0,4,7]
-triadDimnished = fromOffsets' [0,3,6]
-triadAugmented = fromOffsets' [0,4,8]
+triadMinor     = emptyScale #+ 0 #+ 3 #+ 7
+triadMajor     = emptyScale #+ 0 #+ 4 #+ 7
+triadDimnished = emptyScale #+ 0 #+ 3 #+ 6
+triadAugmented = emptyScale #+ 0 #+ 4 #+ 8

@@ -1,7 +1,10 @@
 {-# LANGUAGE BangPatterns #-}
 module Music.Theory.Scale
   ( Scale
+  , emptyScale
   , hasOffset
+  , setOffset
+  , (#+)
   , fromOffsets
   , toOffsets
   , lower
@@ -17,6 +20,9 @@ import Test.QuickCheck (Arbitrary, arbitrary, choose)
 -- |Type for a octave repeating scale.
 newtype Scale = Scale { bitField :: Word }
   deriving (Eq, Show)
+
+emptyScale :: Scale
+emptyScale = Scale 0
 
 instance Arbitrary Scale where
   arbitrary = Scale `fmap` choose (1, 4095) -- 4095 = 2^12-1
@@ -36,7 +42,12 @@ unsafeClear a i = assert (i >= 0 && i < 64) $
 hasOffset :: Scale -> ScaleOffset -> Bool
 hasOffset s = unsafeTest (bitField s) . fromScaleOffset
 
-{-# INLINE fromOffsets #-}
+setOffset :: Scale -> Int -> Scale
+setOffset (Scale s) i = Scale (unsafeSet s i)
+
+(#+) :: Scale -> Int -> Scale
+(#+) = setOffset
+
 fromOffsets :: [ScaleOffset] -> Scale
 fromOffsets = Scale . go 0
   where
