@@ -110,7 +110,7 @@ accidental = \case
 -- The Note type is much better to use in code and SPN should only be used
 -- for user interaction.
 data SPN = SPN
-  { octave :: {-# UNPACK #-} !Octave
+  { octave     :: !Octave
   , pitchClass :: !PitchClass
   }
   deriving Eq
