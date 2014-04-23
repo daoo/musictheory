@@ -27,7 +27,7 @@ scaleOffset :: Note -> ScaleOffset
 scaleOffset (Note n) = ScaleOffset (mod n 12)
 
 instance Arbitrary Note where
-  arbitrary = Note <$> choose (-50, 200)
+  arbitrary = Note <$> arbitrary
 
   shrink = map Note . shrink . fromIntegral
 
