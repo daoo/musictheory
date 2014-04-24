@@ -51,8 +51,11 @@ newtype ScaleOffset = ScaleOffset { fromScaleOffset :: Int }
 instance Arbitrary ScaleOffset where
   arbitrary = ScaleOffset `fmap` choose (0, 11)
 
+isScaleOffset :: (Ord i, Integral i) => i -> Bool
+isScaleOffset i = i >= 0 && i <= 11
+
 unsafeScaleOffset :: Int -> ScaleOffset
-unsafeScaleOffset i = assert (i >= 0 && i < 12) (ScaleOffset i)
+unsafeScaleOffset i = assert (isScaleOffset i) (ScaleOffset i)
 
 scaled :: Offset -> ScaleOffset
 scaled (Offset a) = ScaleOffset (mod a 12)
