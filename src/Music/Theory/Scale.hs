@@ -40,12 +40,15 @@ instance Arbitrary Scale where
 
 -- |Decides if the note at a specific scale offset is included or not.
 --
--- > forall i. hasOffset emptyScale i == False
--- > forall i. hasOffset fullScale i == True
+-- prop> forall i. hasOffset emptyScale i == False
+-- prop> forall i. hasOffset fullScale i == True
 hasOffset :: Scale -> ScaleOffset -> Bool
 hasOffset s = unsafeTest (bitField s) . fromScaleOffset
 
 -- |Set a note at a specific offset to be included.
+--
+-- prop> forall i. setOffset fullScale i == fullScale
+-- prop> forall s i. hasOffset (setOffset s i) i == True
 setOffset :: Scale -> ScaleOffset -> Scale
 setOffset (Scale s) = Scale . unsafeSet s . fromScaleOffset
 
@@ -54,6 +57,8 @@ setOffset (Scale s) = Scale . unsafeSet s . fromScaleOffset
 Scale s #+ i = Scale (unsafeSet s (fromIntegral i))
 
 -- |Merge a list of scale offsets into a scale.
+--
+-- prop> toOffsets . fromOffsets == id
 fromOffsets :: [ScaleOffset] -> Scale
 fromOffsets = foldl' setOffset emptyScale
 

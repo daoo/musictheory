@@ -26,11 +26,11 @@ genScaleOffsets :: Gen [ScaleOffset]
 genScaleOffsets = choose (1, 12) >>= genRemoveRandom
   (map unsafeScaleOffset [0,1,2,3,4,5,6,7,8,9,10,11])
 
-prop_spnFromTo :: SPN -> Bool
-prop_spnFromTo n = n == fromNote (toNote n)
-
 prop_semiFromTo :: Note -> Bool
 prop_semiFromTo n = n == toNote (fromNote n)
+
+prop_spnFromTo :: SPN -> Bool
+prop_spnFromTo n = n == fromNote (toNote n)
 
 prop_mkSPN :: SPN -> Bool
 prop_mkSPN n@(SPN o p) = n == mkSPN o (tone p) (accidental p)
@@ -40,6 +40,18 @@ prop_offsetFromTo o = o == toOffset (fromOffset o)
 
 prop_pitchClassFromTo :: PitchClass -> Bool
 prop_pitchClassFromTo p = p == fromOffset (toOffset p)
+
+prop_hasEmpty :: ScaleOffset -> Bool
+prop_hasEmpty = not . hasOffset emptyScale
+
+prop_hasFull :: ScaleOffset -> Bool
+prop_hasFull = hasOffset fullScale
+
+prop_setFull :: ScaleOffset -> Bool
+prop_setFull = (fullScale==) . setOffset fullScale
+
+prop_setHas :: Scale -> ScaleOffset -> Bool
+prop_setHas s i = hasOffset (setOffset s i) i
 
 prop_offsetsFromTo :: Property
 prop_offsetsFromTo = forAll genScaleOffsets $ \offsets ->
@@ -67,9 +79,13 @@ tests = testGroup "Tests"
     , testProperty "PitchClass conversion" prop_pitchClassFromTo
     ]
   , testGroup "Scale properties"
-    [ testProperty "ScaleOffsets conversion" prop_offsetsFromTo
-    , testProperty "Scale conversion"        prop_scaleFromTo
-    , testProperty "Chromatic has all notes" prop_chromaticAll
+    [ testProperty "has emptyScale always false" prop_hasEmpty
+    , testProperty "has fullScale always true"   prop_hasFull
+    , testProperty "set fullScale unchanged"     prop_setFull
+    , testProperty "set/has always true"         prop_setHas
+    , testProperty "ScaleOffsets conversion"     prop_offsetsFromTo
+    , testProperty "Scale conversion"            prop_scaleFromTo
+    , testProperty "Chromatic has all notes"     prop_chromaticAll
     ]
   , testGroup "Note values"
     [ testCase "0 is C0"  (fromNote 0  @= mkSPN 0 C Natural)
