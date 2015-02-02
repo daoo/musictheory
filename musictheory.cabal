@@ -14,7 +14,6 @@ cabal-version:       >=1.10
 
 library
   exposed-modules:
-    Music.Theory.Diatonic
     Music.Theory.Note
     Music.Theory.SPN
     Music.Theory.Scale

@@ -12,4 +12,4 @@ data Rooted = Rooted
   } deriving Show
 
 hasNote :: Note -> Rooted -> Bool
-hasNote n (Rooted r s) = hasOffset s (scaled $ n `off` r)
+hasNote n (Rooted r s) = hasOffset s (unsafeInterval12 $ n .-. r)

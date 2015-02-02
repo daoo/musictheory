@@ -1,61 +1,88 @@
-{-# LANGUAGE LambdaCase, GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 module Music.Theory.Note
   ( Note
-  , scaleOffset
+  , c0
 
-  , Offset(Offset)
+  , (.+)
   , (+.)
-  , off
+  , (.-.)
 
-  , ScaleOffset(fromScaleOffset)
-  , unsafeScaleOffset
-  , scaled
+  , Interval
+  , Interval12
+  , fromInterval12
+  , unsafeInterval12
+  , safeInterval12
+
+  , perfectUnison
+  , minor2
+  , major2
+  , minor3
+  , major3
+  , perfect4
+  , tritone
+  , perfect5
+  , minor6
+  , major6
+  , minor7
+  , major7
+  , perfectOctave
   ) where
 
-import Control.Applicative
-import Control.Exception
 import Test.QuickCheck
 
--- |Type for musical notes.
---
--- The value 0 is C0 and then it increments with semitone steps.
-newtype Note = Note Int
-  deriving (Eq, Ord, Enum, Num, Real, Integral, Show)
-
--- |Calculate the scale offset relative to a scale rooted in C.
-scaleOffset :: Note -> ScaleOffset
-scaleOffset (Note n) = ScaleOffset (mod n 12)
+-- |A note (in semitones).
+newtype Note = Note { mkNote :: Int }
+  deriving (Show, Eq, Ord)
 
 instance Arbitrary Note where
-  arbitrary = Note <$> arbitrary
+  arbitrary = fmap Note arbitrary
+  shrink = map Note . shrink . mkNote
 
-  shrink = map Note . shrink . fromIntegral
+c0 :: Note
+c0 = Note 0
 
--- |Type for the semitone distance between two notes.
-newtype Offset = Offset Int
-  deriving (Eq, Ord, Enum, Show)
+-- | Add an interval to a note.
+--
+-- prop> a .+ 0 == a
+-- prop> 0 +. a == a
+-- prop> a .+ b == b +. a
+(.+) :: Note -> Interval -> Note
+(+.) :: Interval -> Note -> Note
+n .+ i = Note (mkNote     n + mkInterval i)
+i +. n = Note (mkInterval i + mkNote     n)
 
-instance Arbitrary Offset where
-  arbitrary = Offset `fmap` choose (-100, 100)
+(.-.) :: Note -> Note -> Interval
+n .-. m = Interval (mkNote n - mkNote m)
 
-(+.) :: Note -> Offset -> Note
-Note a +. Offset b = Note (a + b)
+-- |Distance (in semitones) between two notes.
+newtype Interval = Interval { mkInterval :: Int }
+  deriving (Eq, Ord, Enum, Num, Real, Integral, Show)
 
-off :: Note -> Note -> Offset
-off a b = Offset (fromIntegral a - fromIntegral b)
+newtype Interval12 = Interval12 { mkInterval12 :: Int }
+  deriving (Eq, Ord)
 
--- |Type for the distance between two pitches within a pitch class.
-newtype ScaleOffset = ScaleOffset { fromScaleOffset :: Int }
-  deriving (Eq, Ord, Show)
+fromInterval12 :: Interval12 -> Int
+fromInterval12 = mkInterval12
 
-instance Arbitrary ScaleOffset where
-  arbitrary = ScaleOffset `fmap` choose (0, 11)
+safeInterval12 :: Interval -> Interval12
+safeInterval12 i = Interval12 $ mkInterval i `mod` 12
 
-isScaleOffset :: (Ord i, Integral i) => i -> Bool
-isScaleOffset i = i >= 0 && i <= 11
+unsafeInterval12 :: Interval -> Interval12
+unsafeInterval12 = Interval12 . mkInterval
 
-unsafeScaleOffset :: Int -> ScaleOffset
-unsafeScaleOffset i = assert (isScaleOffset i) (ScaleOffset i)
-
-scaled :: Offset -> ScaleOffset
-scaled (Offset a) = ScaleOffset (mod a 12)
+-- |Diatonic Intervals.
+perfectUnison, minor2, major2, minor3, major3, perfect4, tritone, perfect5,
+  minor6, major6, minor7, major7, perfectOctave :: Interval
+perfectUnison = Interval 0
+minor2        = Interval 1
+major2        = Interval 2
+minor3        = Interval 3
+major3        = Interval 4
+perfect4      = Interval 5
+tritone       = Interval 6
+perfect5      = Interval 7
+minor6        = Interval 8
+major6        = Interval 9
+minor7        = Interval 10
+major7        = Interval 11
+perfectOctave = Interval 12

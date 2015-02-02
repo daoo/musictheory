@@ -148,16 +148,16 @@ instance Show SPN where
 instance Arbitrary SPN where
   arbitrary = SPN <$> arbitrary <*> arbitrary
 
-toOffset :: PitchClass -> ScaleOffset
-toOffset = unsafeScaleOffset . fromEnum
+toOffset :: PitchClass -> Interval12
+toOffset = unsafeInterval12 . fromIntegral . fromEnum
 
-fromOffset :: ScaleOffset -> PitchClass
-fromOffset = toEnum . fromScaleOffset
+fromOffset :: Interval12 -> PitchClass
+fromOffset = toEnum . fromInterval12
 
 toNote :: SPN -> Note
-toNote (SPN o p) = fromIntegral $ fromIntegral o * 12 + fromEnum p
+toNote (SPN o p) = c0 .+ fromIntegral (mkOctave o * 12 + fromEnum p)
 
 fromNote :: Note -> SPN
 fromNote n = SPN (Octave q) (toEnum r)
   where
-    (q, r) = fromIntegral n `divMod` 12
+    (q, r) = fromIntegral (n .-. c0) `divMod` 12

@@ -42,15 +42,15 @@ instance Arbitrary Scale where
 --
 -- prop> forall i. hasOffset emptyScale i == False
 -- prop> forall i. hasOffset fullScale i == True
-hasOffset :: Scale -> ScaleOffset -> Bool
-hasOffset s = unsafeTest (bitField s) . fromScaleOffset
+hasOffset :: Scale -> Interval12 -> Bool
+hasOffset s = unsafeTest (bitField s) . fromInterval12
 
 -- |Set a note at a specific offset to be included.
 --
 -- prop> forall i. setOffset fullScale i == fullScale
 -- prop> forall s i. hasOffset (setOffset s i) i == True
-setOffset :: Scale -> ScaleOffset -> Scale
-setOffset (Scale s) = Scale . unsafeSet s . fromScaleOffset
+setOffset :: Scale -> Interval12 -> Scale
+setOffset (Scale s) = Scale . unsafeSet s . fromInterval12
 
 -- |Infix version of 'setOffset' with Int as type.
 (#+) :: Scale -> Word8 -> Scale
@@ -59,11 +59,11 @@ Scale s #+ i = Scale (unsafeSet s (fromIntegral i))
 -- |Merge a list of scale offsets into a scale.
 --
 -- prop> toOffsets . fromOffsets == id
-fromOffsets :: [ScaleOffset] -> Scale
+fromOffsets :: [Interval12] -> Scale
 fromOffsets = foldl' setOffset emptyScale
 
-toOffsets :: Scale -> [ScaleOffset]
-toOffsets (Scale bits) = enumFilter 0 11 (unsafeTest bits) unsafeScaleOffset
+toOffsets :: Scale -> [Interval12]
+toOffsets (Scale bits) = enumFilter 0 11 (unsafeTest bits) (unsafeInterval12 . fromIntegral)
 
 -- |Lower the a note in the scale one half step.
 lower :: Int -> Scale -> Scale
